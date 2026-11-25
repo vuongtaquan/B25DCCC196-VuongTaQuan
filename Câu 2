@@ -1,0 +1,80 @@
+import java.util.*;
+
+abstract class SinhVien {
+    String maSV;
+    int soTinChi;
+
+    SinhVien(String maSV, int soTinChi) {
+        this.maSV = maSV;
+        this.soTinChi = soTinChi;
+    }
+
+    abstract long hocPhi();
+}
+
+class ChinhQuy extends SinhVien {
+    ChinhQuy(String ma, int tc) {
+        super(ma, tc);
+    }
+
+    @Override
+    public long hocPhi() {
+        return soTinChi * 450000L;
+    }
+}
+
+class ChatLuongCao extends SinhVien {
+    ChatLuongCao(String ma, int tc) {
+        super(ma, tc);
+    }
+
+    @Override
+    public long hocPhi() {
+        return Math.round(soTinChi * 450000L * 1.5);
+    }
+}
+
+class LienThong extends SinhVien {
+    LienThong(String ma, int tc) {
+        super(ma, tc);
+    }
+
+    @Override
+    public long hocPhi() {
+        return soTinChi * 450000L + 2000000L;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextLine()) {
+            return;
+        }
+        int n = Integer.parseInt(sc.nextLine().trim());
+
+        for (int i = 0; i < n; i++) {
+            String line = sc.nextLine().trim();
+            if (line.isEmpty()) {
+                i--;
+                continue;
+            }
+            String[] a = line.split("\\s+");
+
+            String he = a[0];
+            String ma = a[1];
+            int tc = Integer.parseInt(a[2]);
+
+            SinhVien sv;
+
+            if (he.equals("CQ"))
+                sv = new ChinhQuy(ma, tc);
+            else if (he.equals("CLC"))
+                sv = new ChatLuongCao(ma, tc);
+            else
+                sv = new LienThong(ma, tc);
+
+            System.out.println(ma + " " + he + " " + sv.hocPhi());
+        }
+    }
+}
