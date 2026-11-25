@@ -1,0 +1,145 @@
+import java.util.*;
+
+class DuLieuKhongHopLeException extends Exception {
+    DuLieuKhongHopLeException(String s) {
+        super(s);
+    }
+}
+
+abstract class SinhVien {
+    String maSV, he;
+    int soTinChi;
+
+    SinhVien(String he, String ma, int tc) {
+        this.he = he;
+        this.maSV = ma;
+        this.soTinChi = tc;
+    }
+
+    abstract long hocPhi();
+}
+
+class ChinhQuy extends SinhVien {
+    ChinhQuy(String ma, int tc) {
+        super("CQ", ma, tc);
+    }
+
+    @Override
+    long hocPhi() {
+        return soTinChi * 450000L;
+    }
+}
+
+class ChatLuongCao extends SinhVien {
+    ChatLuongCao(String ma, int tc) {
+        super("CLC", ma, tc);
+    }
+
+    @Override
+    long hocPhi() {
+        return soTinChi * 450000L * 3 / 2;
+    }
+}
+
+class LienThong extends SinhVien {
+    LienThong(String ma, int tc) {
+        super("LT", ma, tc);
+    }
+
+    @Override
+    long hocPhi() {
+        return soTinChi * 450000L + 2000000L;
+    }
+}
+
+class QuanLyHocPhi {
+    ArrayList<SinhVien> ds = new ArrayList<>();
+    HashSet<String> maDaCo = new HashSet<>();
+
+    void them(String he, String ma, String tc)
+            throws DuLieuKhongHopLeException {
+
+        if (!he.equals("CQ") && !he.equals("CLC")
+                && !he.equals("LT"))
+            throw new DuLieuKhongHopLeException("INVALID " + ma);
+
+        int soTC;
+        try {
+            soTC = Integer.parseInt(tc);
+        } catch (Exception e) {
+            throw new DuLieuKhongHopLeException("INVALID " + ma);
+        }
+
+        if (soTC < 1 || soTC > 30 || maDaCo.contains(ma))
+            throw new DuLieuKhongHopLeException("INVALID " + ma);
+
+        SinhVien sv;
+
+        if (he.equals("CQ"))
+            sv = new ChinhQuy(ma, soTC);
+        else if (he.equals("CLC"))
+            sv = new ChatLuongCao(ma, soTC);
+        else
+            sv = new LienThong(ma, soTC);
+
+        ds.add(sv);
+        maDaCo.add(ma);
+    }
+
+    void inDanhSach() {
+        ds.sort((a, b) -> {
+            int c = Long.compare(b.hocPhi(), a.hocPhi());
+            return c != 0 ? c : a.maSV.compareTo(b.maSV);
+        });
+
+        long tong = 0;
+
+        for (SinhVien sv : ds) {
+            System.out.println(sv.maSV + " " + sv.he
+                    + " " + sv.hocPhi());
+            tong += sv.hocPhi();
+        }
+
+        System.out.println("TONG " + tong);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextLine()) {
+            return;
+        }
+        int n = Integer.parseInt(sc.nextLine().trim());
+
+        QuanLyHocPhi ql = new QuanLyHocPhi();
+        ArrayList<String> loi = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            if (!sc.hasNextLine()) {
+                break;
+            }
+            String line = sc.nextLine().trim();
+            if (line.isEmpty()) {
+                i--;
+                continue;
+            }
+            String[] a = line.split("\\s+");
+
+            try {
+                if (a.length != 3)
+                    throw new DuLieuKhongHopLeException(
+                            "INVALID " + (a.length > 1 ? a[1] : ""));
+
+                ql.them(a[0], a[1], a[2]);
+            } catch (DuLieuKhongHopLeException e) {
+                loi.add(e.getMessage());
+            }
+        }
+
+        for (String s : loi)
+            System.out.println(s);
+
+        ql.inDanhSach();
+    }
+}
